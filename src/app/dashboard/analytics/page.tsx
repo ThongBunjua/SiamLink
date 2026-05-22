@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { 
-  BarChart2, Sparkles, ShieldAlert, ArrowLeft, TrendingUp, CheckCircle, 
-  Eye, MousePointerClick, Calendar, Zap, Layout
+import {
+  BarChart2, Sparkles, ShieldAlert, ArrowLeft, TrendingUp, CheckCircle,
+  MousePointerClick, Calendar, Zap, Layout
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Profile, LinkItem } from '@/lib/types';
@@ -44,7 +44,7 @@ export default function AnalyticsPage() {
         .maybeSingle();
 
       if (profileError || !profileData) throw profileError || new Error('No profile found');
-      
+
       const p = profileData as Profile;
       setProfile(p);
 
@@ -85,7 +85,7 @@ export default function AnalyticsPage() {
 
         // Sort by click counts descending
         analyticsList.sort((a, b) => b.click_count - a.click_count);
-        
+
         setLinksAnalytics(analyticsList);
         setTotalClicks(grandTotal);
       }
@@ -96,24 +96,37 @@ export default function AnalyticsPage() {
     }
   };
 
-  // Sandbox simulated upgrade trigger
-  const handleUpgradeToPro = async () => {
-    if (!profile) return;
+  // ✅ เชื่อมต่อระบบชำระเงินจริงผ่าน Stripe Checkout API แทนตัวจำลองอันเดิม
+  const handleUpgradeToProReal = async () => {
+    if (!profile || !session) return;
     setUpgradeLoading(true);
-    
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ plan: 'pro' })
-        .eq('id', profile.id);
 
-      if (error) throw error;
-      
-      setProfile(prev => prev ? { ...prev, plan: 'pro' } : null);
-      // Automatically load analytics after simulated upgrade
-      await loadAnalyticsData(session.user.id);
-    } catch (err) {
-      console.error('Failed to trigger upgrade', err);
+    try {
+      // ยิงไปหา API Route ตัวรับเงิน (เปลี่ยน '/api/checkout' ตามพาธจริงของคุณหากวางโฟลเดอร์ไว้ชื่ออื่น)
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}` // ส่ง Token ตรวจสอบสิทธิ์แบบ Bearer
+        },
+        body: JSON.stringify({
+          profile_id: profile.id
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'เกิดข้อผิดพลาดจากระบบชำระเงิน');
+      }
+
+      // วาร์ปผู้ใช้ไปสแกน PromptPay บนระบบความปลอดภัยของ Stripe
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (err: any) {
+      console.error('Failed to trigger Stripe checkout session:', err);
+      alert(err.message || 'ไม่สามารถเชื่อมต่อกับระบบชำระเงินได้ในขณะนี้');
     } finally {
       setUpgradeLoading(false);
     }
@@ -162,7 +175,7 @@ export default function AnalyticsPage() {
 
         {/* Lock Screen paywall container */}
         <main className="max-w-4xl mx-auto px-6 py-12 flex-1 w-full flex flex-col items-center justify-center">
-          
+
           <div className="bg-white border border-[#e4dfd5] rounded-3xl p-8 md:p-12 shadow-xl w-full text-center relative overflow-hidden flex flex-col items-center">
             {/* Top decorative badge */}
             <div className="inline-flex p-3 bg-pink-50 text-pink-500 rounded-2xl mb-6">
@@ -216,16 +229,26 @@ export default function AnalyticsPage() {
                 <span className="text-4xl font-extrabold tracking-tight">129</span>
                 <span className="text-lg font-bold opacity-75">บาท / เดือน</span>
               </div>
-              <p className="text-[10px] opacity-60 mt-1">ยกเลิกหรือสลับแพลนได้ทุกเมื่อ ไม่มีสัญญาผูกมัด</p>
+              <p className="text-[10px] opacity-60 mt-1">ใช้งานสิทธิ์ Pro ยาวนาน 30 วัน ไม่มีข้อผูกมัด</p>
             </div>
 
+            {/* ปุ่มกดใหม่ที่ทำการผูกแอนิเมชันสถานะกำลังเรียกตัวข้อมูล Stripe */}
             <button
-              onClick={handleUpgradeToPro}
+              onClick={handleUpgradeToProReal}
               disabled={upgradeLoading}
               className="px-8 py-4 bg-gradient-to-r from-pink-600 to-indigo-600 text-white font-extrabold rounded-2xl hover:opacity-95 shadow-lg hover:shadow-pink-500/20 active:scale-98 transition-all duration-300 text-sm flex items-center gap-2 cursor-pointer disabled:opacity-50"
             >
-              <Zap className="w-4 h-4 fill-white" />
-              {upgradeLoading ? 'กำลังทำรายการ...' : 'อัปเกรดเป็น SiamLink Pro ทันที (จำลอง) ⚡'}
+              {upgradeLoading ? (
+                <>
+                  <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
+                  กำลังพาไปหน้าสแกนชำระเงินความปลอดภัยสูง...
+                </>
+              ) : (
+                <>
+                  <Zap className="w-4 h-4 fill-white" />
+                  อัปเกรดเป็น SiamLink Pro เดี๋ยวกนี้เลย ⚡
+                </>
+              )}
             </button>
           </div>
         </main>
@@ -265,7 +288,7 @@ export default function AnalyticsPage() {
 
       {/* Main Analytics Content */}
       <main className="max-w-[1500px] mx-auto px-6 py-8 flex-1 w-full flex flex-col gap-8">
-        
+
         {/* KPI Top Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white border border-[#e4dfd5] rounded-3xl p-8 shadow-sm flex items-center gap-5">
@@ -305,7 +328,7 @@ export default function AnalyticsPage() {
 
         {/* Visual Charts & Rankings Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
+
           {/* Rank Distribution chart */}
           <div className="bg-white border border-[#e4dfd5] rounded-3xl p-8 shadow-sm lg:col-span-8 flex flex-col gap-6">
             <h3 className="text-lg md:text-xl font-black uppercase tracking-wider opacity-85 flex items-center gap-2">
@@ -321,7 +344,7 @@ export default function AnalyticsPage() {
                 {linksAnalytics.map((link) => {
                   const maxClicks = Math.max(...linksAnalytics.map(l => l.click_count)) || 1;
                   const pct = (link.click_count / maxClicks) * 100;
-                  
+
                   return (
                     <div key={link.id} className="flex flex-col gap-2">
                       <div className="flex items-center justify-between text-sm md:text-base font-extrabold">
@@ -329,7 +352,7 @@ export default function AnalyticsPage() {
                         <span>{link.click_count} ครั้ง ({pct.toFixed(0)}%)</span>
                       </div>
                       <div className="w-full h-4 bg-stone-100 rounded-full overflow-hidden">
-                        <div 
+                        <div
                           className="h-full bg-gradient-to-r from-pink-500 to-indigo-500 rounded-full transition-all duration-1000"
                           style={{ width: `${pct}%` }}
                         />
