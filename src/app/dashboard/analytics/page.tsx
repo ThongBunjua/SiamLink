@@ -246,7 +246,7 @@ export default function AnalyticsPage() {
               ) : (
                 <>
                   <Zap className="w-4 h-4 fill-white" />
-                  อัปเกรดเป็น SiamLink Pro เดี๋ยวกนี้เลย ⚡
+                  อัปเกรดเป็น SiamLink Pro เดี๋ยวนี้เลย ⚡
                 </>
               )}
             </button>
