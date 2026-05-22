@@ -43,31 +43,30 @@ export async function POST(request: Request) {
     const requestUrl = new URL(request.url);
     const origin = requestUrl.origin;
 
-    // 4. Initialize Stripe Checkout Session
+    // 4. Initialize Stripe Checkout Session (แก้ไขเพื่อรองรับ PromptPay)
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card', 'promptpay'],
+      payment_method_types: ['card', 'promptpay'], // ทำงานร่วมกันได้สมบูรณ์แบบในโหมด payment
       billing_address_collection: 'auto',
       line_items: [
         {
           price_data: {
             currency: 'thb',
             product_data: {
-              name: 'SiamLink Pro Plan',
+              name: 'SiamLink Pro Plan (ใช้งาน 30 วัน)',
               description: 'ปลดล็อกฟีเจอร์พรีเมียม (ลบลายน้ำท้ายเว็บ, ธีมสีสันสดใส, ขยับปุ่มเรียกสายตา, ฝังคลิป YouTube/TikTok ได้ไม่จำกัด)',
             },
             unit_amount: 12900, // 129.00 THB
-            recurring: {
-              interval: 'month',
-            },
+            // 💡 นำโครงสร้าง recurring ออก เพื่อเปลี่ยนมาเป็นชำระเงินรายครั้งตามเงื่อนไขของ PromptPay
           },
           quantity: 1,
         },
       ],
-      mode: 'subscription',
+      mode: 'payment', // 💡 เปลี่ยนจาก 'subscription' เป็น 'payment'
       metadata: {
         profile_id: profile_id,
         user_id: user.id,
         user_email: user.email || '',
+        purchase_type: 'pro_30_days', // ส่งบอก Webhook ว่าเป็นการเปิดใช้งาน Pro 30 วัน
       },
       success_url: `${origin}/dashboard/payment-status?status=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/dashboard/payment-status?status=cancel`,
