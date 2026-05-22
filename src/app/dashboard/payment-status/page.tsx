@@ -1,11 +1,11 @@
 'use client';
-
-import React, { useEffect, useState } from 'react';
+export const dynamic = 'force-dynamic';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Sparkles, CheckCircle, XCircle, ArrowRight, ShieldCheck, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 
-export default function PaymentStatusPage() {
+function PaymentStatusContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const status = searchParams.get('status');
@@ -31,13 +31,12 @@ export default function PaymentStatusPage() {
   return (
     <main className="min-h-screen bg-[#fdfbf7] text-[#3e2723] flex flex-col items-center justify-center p-6 font-sans">
       <div className="w-full max-w-lg bg-white border border-[#e4dfd5] rounded-[2.5rem] p-8 md:p-10 shadow-2xl relative overflow-hidden text-center flex flex-col gap-6">
-        
+
         {/* Top brand-aligned aesthetic stripe */}
-        <div className={`absolute top-0 left-0 right-0 h-3 bg-gradient-to-r ${
-          isSuccess 
-            ? 'from-emerald-500 via-teal-400 to-indigo-500' 
-            : 'from-rose-500 via-pink-400 to-amber-500'
-        }`} />
+        <div className={`absolute top-0 left-0 right-0 h-3 bg-gradient-to-r ${isSuccess
+          ? 'from-emerald-500 via-teal-400 to-indigo-500'
+          : 'from-rose-500 via-pink-400 to-amber-500'
+          }`} />
 
         {isSuccess ? (
           /* SUCCESS STATE PANEL */
@@ -148,5 +147,20 @@ export default function PaymentStatusPage() {
         </p>
       </div>
     </main>
+  );
+}
+
+export default function PaymentStatusPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-[#fdfbf7] text-[#3e2723] flex flex-col items-center justify-center p-6 font-sans">
+        <div className="w-full max-w-lg bg-white border border-[#e4dfd5] rounded-[2.5rem] p-8 md:p-10 shadow-2xl relative overflow-hidden text-center flex flex-col items-center justify-center min-h-[300px]">
+          <div className="w-12 h-12 border-4 border-[#3e2723] border-t-transparent rounded-full animate-spin"></div>
+          <p className="mt-4 text-sm font-bold text-stone-500">กำลังโหลด...</p>
+        </div>
+      </main>
+    }>
+      <PaymentStatusContent />
+    </Suspense>
   );
 }
