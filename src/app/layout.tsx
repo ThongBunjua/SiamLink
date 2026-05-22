@@ -6,7 +6,11 @@ export const metadata: Metadata = {
   description: "สร้างหน้าลิงก์ในไบโอส่วนตัวของคุณฟรี สวยงาม รวดเร็ว รองรับปุ่มแชร์เลขบัญชีโอนเงินแบบคัดลอกในคลิกเดียว บายพาสเบราว์เซอร์ LINE/TikTok ได้ในตัว",
   keywords: ["SiamLink", "Link in Bio", "ลิงก์ในไบโอ", "TikToker", "ครีเอเตอร์", "ปุ่มโอนเงิน", "บายพาส LINE"],
   authors: [{ name: "SiamLink Team" }],
-
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
+  },
   verification: {
     google: "zgOtjgGcdcozh9URwlrROHCg-Xok0VJEvsXpPfEVbTY",
   },

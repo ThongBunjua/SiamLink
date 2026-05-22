@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Sparkles } from 'lucide-react';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -37,11 +38,13 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-white border border-[#d5bdaf]/40 rounded-3xl p-8 md:p-10 shadow-xl relative z-10 transition-all duration-300">
         <div className="flex flex-col items-center text-center">
           {/* Logo Brand Icon */}
-          <div className="w-16 h-16 rounded-2xl bg-[#f5ebe0] border border-[#d5bdaf]/70 flex items-center justify-center shadow-xs mb-5">
-            <span className="text-2xl font-black tracking-tighter text-[#3e2723] flex items-center">
-              S<span className="text-pink-600 font-extrabold">L</span>
-            </span>
-          </div>
+          <Image
+            src="/icon.png"
+            alt="SiamLink Logo"
+            width={64}
+            height={64}
+            className="rounded-2xl shadow-xs mb-5 object-cover"
+          />
 
           <h1 className="text-2xl font-black tracking-tight leading-tight">
             เข้าสู่ระบบ Siam<span className="text-pink-600 font-black">Link</span>

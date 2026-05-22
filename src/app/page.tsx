@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Sparkles, CreditCard, MessageCircle, Zap, CheckCircle2,
   ArrowRight, ArrowUpRight, Copy, Check, Play, Video, Lock, X
@@ -33,10 +34,14 @@ export default function Home() {
       {/* ─── Fixed Navbar ─── */}
       <header className="fixed top-0 left-0 right-0 border-b border-[#e4dfd5]/60 bg-[#fdfbf7]/85 backdrop-blur-xl z-50 px-6 py-3.5 transition-all duration-300">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group cursor-pointer">
-            <div className="w-8 h-8 rounded-lg bg-[#f5ebe0] border border-[#d5bdaf]/60 flex items-center justify-center shadow-xs">
-              <span className="text-sm font-black text-[#3e2723]">S<span className="text-pink-600">L</span></span>
-            </div>
+          <Link href="/" className="flex items-center gap-2.5 group cursor-pointer">
+            <Image
+              src="/icon.png"
+              alt="SiamLink Logo"
+              width={32}
+              height={32}
+              className="rounded-lg shadow-xs object-cover"
+            />
             <span className="text-xl font-black text-[#3e2723] tracking-tight group-hover:scale-102 transition-transform">
               SiamLink
             </span>
@@ -116,9 +121,13 @@ export default function Home() {
 
                     {/* Profile header */}
                     <div className="flex flex-col items-center mt-2 text-center">
-                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#f5ebe0] to-[#ebd5c7] border-2 border-white/60 shadow-md mb-2 flex items-center justify-center font-bold text-sm text-[#3e2723]">
-                        SL
-                      </div>
+                      <Image
+                        src="/icon.png"
+                        alt="SiamLink Logo"
+                        width={56}
+                        height={56}
+                        className="w-14 h-14 rounded-full border-2 border-white/60 shadow-md mb-2 object-cover"
+                      />
                       <h4 className="text-xs font-bold text-[#3e2723]">@siam_creator</h4>
                       <p className="text-[9px] opacity-65 mt-0.5 font-medium max-w-[180px] leading-relaxed">ร้านค้าและอินฟลูเอนเซอร์ ☕ รวมลิงก์ขายของใน TikTok</p>
                     </div>
